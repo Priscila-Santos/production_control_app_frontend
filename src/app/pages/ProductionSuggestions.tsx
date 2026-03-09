@@ -1,44 +1,54 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { RefreshCw, Package, DollarSign } from "lucide-react";
 import { DataTable } from "../components/shared/DataTable";
-
 import { useGetProductionSuggestionsQuery } from "../../features/production/productionApi";
 
 interface ProductionSuggestion {
   productId: number;
   productName: string;
-  maxProduction: number;
+  requiredQuantity: number;
   unitPrice: number;
+  totalProductionValue: number;
+}
+
+interface TableSuggestion {
+  id: number;
+  productName: string;
+  requiredQuantity: number;
+  unitPrice: number;
+  totalValue: number;
 }
 
 export function ProductionSuggestions() {
-
-  const { data = [], isLoading, refetch } = useGetProductionSuggestionsQuery(undefined);
+  const { data = [], isLoading, refetch } =
+    useGetProductionSuggestionsQuery(undefined);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  if (isLoading) return <p>Loading...</p>;
+  const currencyFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }),
+    []
+  );
 
-  const suggestions = data.map((item: ProductionSuggestion) => {
-
-    const maxProduction = Number(item.maxProduction) || 0;
-    const unitPrice = Number(item.unitPrice) || 0;
-
-    return {
+  const suggestions: TableSuggestion[] = useMemo(() => {
+    return data.map((item: ProductionSuggestion) => ({
       id: item.productId,
       productName: item.productName,
-      requiredQuantity: maxProduction,
-      unitPrice: unitPrice,
-      totalValue: maxProduction * unitPrice,
-    };
-
-  });
+      requiredQuantity: item.requiredQuantity,
+      unitPrice: item.unitPrice,
+      totalValue: item.requiredQuantity * item.unitPrice,
+    }));
+  }, [data]);
 
   const totalSuggestedProducts = suggestions.length;
 
-  const totalEstimatedValue = suggestions.reduce(
-    (sum, s) => sum + s.totalValue,
-    0
+  const totalEstimatedValue = useMemo(
+    () => suggestions.reduce((sum, s) => sum + s.totalValue, 0),
+    [suggestions]
   );
 
   const handleRefresh = async () => {
@@ -47,31 +57,36 @@ export function ProductionSuggestions() {
     setIsRefreshing(false);
   };
 
-  const columns = [
-    { key: "productName", label: "Product Name", width: "30%" },
-    { key: "requiredQuantity", label: "Required Quantity", width: "20%" },
-    {
-      key: "unitPrice",
-      label: "Unit Price",
-      width: "20%",
-      render: (value: number) => `$${value.toFixed(2)}`,
-    },
-    {
-      key: "totalValue",
-      label: "Total Production Value",
-      width: "30%",
-      render: (value: number) => (
-        <span
-          style={{
-            fontWeight: "var(--font-weight-semibold)",
-            color: "var(--color-success)",
-          }}
-        >
-          ${value.toFixed(2)}
-        </span>
-      ),
-    },
-  ];
+  const columns = useMemo(
+    () => [
+      { key: "productName", label: "Product Name", width: "30%" },
+      { key: "requiredQuantity", label: "Required Quantity", width: "20%" },
+      {
+        key: "unitPrice",
+        label: "Unit Price",
+        width: "20%",
+        render: (value: number) => currencyFormatter.format(value),
+      },
+      {
+        key: "totalValue",
+        label: "Total Production Value",
+        width: "30%",
+        render: (value: number) => (
+          <span
+            style={{
+              fontWeight: "var(--font-weight-semibold)",
+              color: "var(--color-success)",
+            }}
+          >
+            {currencyFormatter.format(value)}
+          </span>
+        ),
+      },
+    ],
+    [currencyFormatter]
+  );
+
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <div>
@@ -233,7 +248,7 @@ export function ProductionSuggestions() {
                 marginTop: "var(--spacing-xs)",
               }}
             >
-              ${totalEstimatedValue.toFixed(2)}
+              {currencyFormatter.format(totalEstimatedValue)}
             </h3>
           </div>
         </div>

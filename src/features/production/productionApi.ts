@@ -1,10 +1,11 @@
 import { api } from "../../services/api";
 
-export interface ProductionSuggestion {
+interface ProductionSuggestion {
   productId: number;
   productName: string;
-  maxProduction: number;
+  requiredQuantity: number;
   unitPrice: number;
+  totalProductionValue: number;
 }
 
 export const productionApi = api.injectEndpoints({

@@ -1,4 +1,4 @@
-# 📦 Production Planning System
+# Production Planning System
 
 Sistema full-stack para **gestão de produtos, matérias-primas e planejamento de produção**, permitindo calcular automaticamente **quantos produtos podem ser fabricados com base no estoque disponível**.
 
@@ -10,9 +10,9 @@ A aplicação ajuda a responder perguntas como:
 
 ---
 
-# 🧩 Funcionalidades
+##  Funcionalidades
 
-### 📦 Product Management
+### Product Management
 
 * Criar produtos
 * Listar produtos
@@ -21,7 +21,7 @@ A aplicação ajuda a responder perguntas como:
 
 ---
 
-### 🧪 Raw Materials Management
+### Raw Materials Management
 
 * Cadastrar matérias-primas
 * Atualizar estoque
@@ -29,7 +29,7 @@ A aplicação ajuda a responder perguntas como:
 
 ---
 
-### 🧬 Product Composition
+###  Product Composition
 
 Define **quais matérias-primas compõem um produto**.
 
@@ -42,7 +42,7 @@ Exemplo:
 
 ---
 
-### 🏭 Production Suggestions
+###  Production Suggestions
 
 Calcula automaticamente:
 
@@ -57,7 +57,7 @@ Exemplo:
 
 ---
 
-# 🏗 Arquitetura
+##  Arquitetura
 
 A aplicação segue arquitetura **Full Stack separada**:
 
@@ -73,9 +73,9 @@ PostgreSQL Database
 
 ---
 
-# ⚙️ Tecnologias
+##  Tecnologias
 
-## Frontend
+### Frontend
 
 * React
 * TypeScript
@@ -86,7 +86,7 @@ PostgreSQL Database
 
 ---
 
-## Backend
+### Backend
 
 * Java 17+
 * Spring Boot
@@ -104,9 +104,9 @@ PostgreSQL Database
 
 ---
 
-# 🗂 Estrutura do Projeto
+## 🗂 Estrutura do Projeto
 
-## Frontend
+### Frontend
 
 ```
 frontend
@@ -132,7 +132,7 @@ frontend
 
 ---
 
-## Backend
+### Backend
 
 ```
 backend
@@ -162,7 +162,7 @@ backend
 
 ---
 
-# 🗄 Estrutura do Banco de Dados
+## 🗄 Estrutura do Banco de Dados
 
 ### Products
 
@@ -207,9 +207,9 @@ CREATE TABLE product_raw_materials (
 
 ---
 
-# 🔌 API Endpoints
+## 🔌 API Endpoints
 
-## Products
+### Products
 
 | Método | Endpoint             |
 | ------ | -------------------- |
@@ -317,7 +317,7 @@ http://localhost:5173
 
 ---
 
-## 📊 Lógica de Production Suggestions
+## Lógica de Production Suggestions
 
 O sistema calcula a produção possível usando a fórmula:
 
@@ -335,7 +335,7 @@ A produção máxima de um produto é o **menor valor entre todos os materiais n
 
 ---
 
-## 💡 Exemplo
+## Exemplo
 
 Produto:
 
@@ -372,7 +372,7 @@ Produção máxima:
 
 ---
 
-## 📈 Possíveis Melhorias
+## Possíveis Melhorias
 
 * Controle de ordens de produção
 * Histórico de produção
