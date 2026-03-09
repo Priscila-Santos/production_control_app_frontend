@@ -16,10 +16,10 @@ import { useGetRawMaterialsQuery } from "../../features/rawMaterials/rawMaterial
 import { useGetProductsQuery } from "../../features/products/productsApi";
 
 interface Composition {
-  id: number
+  productId: number
   rawMaterialId: number
   rawMaterialName: string
-  quantityRequired: number
+  requiredQuantity: number
 }
 
 export function ProductComposition() {
@@ -27,8 +27,10 @@ export function ProductComposition() {
   const { productId } = useParams<{ productId: string }>()
   const navigate = useNavigate()
 
+  const numericProductId = Number(productId)
+
   const { data: compositions = [] } =
-    useGetProductCompositionQuery(Number(productId))
+    useGetProductCompositionQuery(numericProductId)
 
   const { data: materials = [] } =
     useGetRawMaterialsQuery(undefined)
@@ -41,7 +43,7 @@ export function ProductComposition() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  const product = products.find(p => p.id === Number(productId))
+  const product = products.find(p => p.id === numericProductId)
 
   if (!product) {
     return (
@@ -51,23 +53,26 @@ export function ProductComposition() {
     )
   }
 
-  const handleAdd = async (data: { rawMaterialId:number, quantityRequired:number }) => {
+  const handleAdd = async (data: { rawMaterialId:number, requiredQuantity:number }) => {
 
     await addComposition({
-      productId: Number(productId),
+      productId: numericProductId,
       rawMaterialId: data.rawMaterialId,
-      quantityRequired: data.quantityRequired
+      requiredQuantity: data.requiredQuantity
     })
 
     setIsDialogOpen(false)
 
   }
 
-  const handleDelete = async (id:number) => {
+  const handleDelete = async (rawMaterialId:number) => {
 
     if(confirm("Are you sure you want to remove this material?")){
 
-      await deleteComposition(id)
+      await deleteComposition({
+        productId: numericProductId,
+        rawMaterialId: rawMaterialId
+      })
 
     }
 
@@ -77,7 +82,7 @@ export function ProductComposition() {
 
     { key:"rawMaterialName", label:"Raw Material", width:"50%" },
 
-    { key:"quantityRequired", label:"Quantity Required", width:"35%" },
+    { key:"requiredQuantity", label:"Quantity Required", width:"35%" },
 
     {
       key:"actions",
@@ -85,7 +90,7 @@ export function ProductComposition() {
       width:"15%",
       render:(_:any,row:Composition)=>(
         <button
-          onClick={()=>handleDelete(row.id)}
+          onClick={()=>handleDelete(row.rawMaterialId)}
           style={{
             padding:"var(--spacing-sm)",
             borderRadius:"var(--radius-md)",
@@ -255,102 +260,3 @@ export function ProductComposition() {
   )
 
 }
-// import { useParams } from "react-router";
-// import { Plus, Trash2 } from "lucide-react";
-// import { useState } from "react";
-
-// import { DataTable } from "../components/shared/DataTable";
-// import { Dialog } from "../components/shared/Dialog";
-// import { CompositionForm } from "../components/composition/CompositionForm";
-
-// import {
-//   useGetProductCompositionQuery,
-//   useAddCompositionMutation,
-//   useDeleteCompositionMutation
-// } from "../../features/compositions/compositionsApi";
-
-// import { useGetRawMaterialsQuery } from "../../features/rawMaterials/rawMaterialsApi";
-
-// export function ProductComposition() {
-
-//   const { productId } = useParams();
-
-//   const { data: compositions = [] } =
-//     useGetProductCompositionQuery(Number(productId));
-
-//   const { data: materials = [] } =
-//     useGetRawMaterialsQuery(undefined);
-
-//   const [addComposition] = useAddCompositionMutation();
-//   const [deleteComposition] = useDeleteCompositionMutation();
-
-//   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-//   const handleAdd = async (data: any) => {
-
-//     await addComposition({
-//       productId: Number(productId),
-//       rawMaterialId: data.rawMaterialId,
-//       quantityRequired: data.quantityRequired
-//     });
-
-//     setIsDialogOpen(false);
-//   };
-
-//   const handleDelete = async (id: number) => {
-
-//     if(confirm("Remove this material?")){
-
-//       await deleteComposition(id);
-
-//     }
-
-//   };
-
-//   const columns = [
-//     { key: "rawMaterialName", label: "Raw Material" },
-//     { key: "quantityRequired", label: "Quantity Required" },
-//     {
-//       key: "actions",
-//       label: "Actions",
-//       render: (_: any, row: any) => (
-//         <button onClick={() => handleDelete(row.id)}>
-//           <Trash2 size={16}/>
-//         </button>
-//       )
-//     }
-//   ];
-
-//   return (
-
-//     <div>
-
-//       <h1 className="page-title">Product Composition</h1>
-
-//       <button onClick={()=>setIsDialogOpen(true)}>
-//         <Plus size={16}/> Add Raw Material
-//       </button>
-
-//       <DataTable
-//         columns={columns}
-//         data={compositions}
-//       />
-
-//       <Dialog
-//         isOpen={isDialogOpen}
-//         onClose={()=>setIsDialogOpen(false)}
-//         title="Add Material"
-//       >
-
-//         <CompositionForm
-//           availableMaterials={materials}
-//           onSubmit={handleAdd}
-//           onCancel={()=>setIsDialogOpen(false)}
-//         />
-
-//       </Dialog>
-
-//     </div>
-
-//   );
-// }

@@ -8,6 +8,7 @@ import { useNavigate } from "react-router";
 import {
   useGetProductsQuery,
   useCreateProductMutation,
+  useUpdateProductMutation,
   useDeleteProductMutation,
 } from "../../features/products/productsApi";
 
@@ -21,7 +22,9 @@ export function Products() {
   const navigate = useNavigate();
 
   const { data: products = [], isLoading } = useGetProductsQuery(undefined);
+
   const [createProduct] = useCreateProductMutation();
+  const [updateProduct] = useUpdateProductMutation();
   const [deleteProduct] = useDeleteProductMutation();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -39,6 +42,18 @@ export function Products() {
     setIsDialogOpen(false);
   };
 
+  const handleEdit = async (data: { name: string; price: number }) => {
+    if (!editingProduct) return;
+
+    await updateProduct({
+      id: editingProduct.id,
+      ...data,
+    });
+
+    setEditingProduct(null);
+    setIsDialogOpen(false);
+  };
+
   const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this product?")) {
       await deleteProduct(id);
@@ -47,6 +62,11 @@ export function Products() {
 
   const openCreateDialog = () => {
     setEditingProduct(null);
+    setIsDialogOpen(true);
+  };
+
+  const openEditDialog = (product: Product) => {
+    setEditingProduct(product);
     setIsDialogOpen(true);
   };
 
@@ -80,6 +100,7 @@ export function Products() {
           </button>
 
           <button
+            onClick={() => openEditDialog(row)}
             style={{
               padding: "var(--spacing-sm)",
               borderRadius: "var(--radius-md)",
@@ -179,105 +200,21 @@ export function Products() {
       {/* Dialog */}
       <Dialog
         isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        title="Create Product"
+        onClose={() => {
+          setIsDialogOpen(false);
+          setEditingProduct(null);
+        }}
+        title={editingProduct ? "Edit Product" : "Create Product"}
       >
         <ProductForm
-          onSubmit={handleCreate}
-          onCancel={() => setIsDialogOpen(false)}
+          initialData={editingProduct || undefined}
+          onSubmit={editingProduct ? handleEdit : handleCreate}
+          onCancel={() => {
+            setIsDialogOpen(false);
+            setEditingProduct(null);
+          }}
         />
       </Dialog>
     </div>
   );
 }
-
-// import React, { useState } from "react";
-// import {
-//   useGetProductsQuery,
-//   useCreateProductMutation,
-//   useDeleteProductMutation,
-// } from "../../features/products/productsApi";
-
-// export const Products = () => {
-//   const { data: products, isLoading } = useGetProductsQuery(undefined);
-
-//   const [createProduct] = useCreateProductMutation();
-//   const [deleteProduct] = useDeleteProductMutation();
-
-//   const [name, setName] = useState("");
-//   const [price, setPrice] = useState("");
-
-//   const handleCreate = async () => {
-//     await createProduct({
-//       name,
-//       price: Number(price),
-//     });
-
-//     setName("");
-//     setPrice("");
-//   };
-
-//   const handleDelete = async (id: number) => {
-//     await deleteProduct(id);
-//   };
-
-//   if (isLoading) return <p>Loading...</p>;
-
-//   return (
-//     <div className="p-6">
-//       <h1 className="text-2xl font-bold mb-4">Products</h1>
-
-//       <div className="mb-6">
-//         <input
-//           className="border p-2 mr-2"
-//           placeholder="Product Name"
-//           value={name}
-//           onChange={(e) => setName(e.target.value)}
-//         />
-
-//         <input
-//           className="border p-2 mr-2"
-//           placeholder="Price"
-//           value={price}
-//           onChange={(e) => setPrice(e.target.value)}
-//         />
-
-//         <button
-//           className="bg-blue-500 text-white px-4 py-2"
-//           onClick={handleCreate}
-//         >
-//           Add Product
-//         </button>
-//       </div>
-
-//       <table className="w-full border">
-//         <thead>
-//           <tr className="bg-gray-200">
-//             <th className="p-2">Name</th>
-//             <th className="p-2">Price</th>
-//             <th className="p-2">Actions</th>
-//           </tr>
-//         </thead>
-
-//         <tbody>
-//           {products?.map((product) => (
-//             <tr key={product.id}>
-//               <td className="p-2">{product.name}</td>
-//               <td className="p-2">{product.price}</td>
-//               <td className="p-2">
-//                 <button
-//                   className="text-red-500"
-//                   onClick={() => handleDelete(product.id)}
-//                 >
-//                   Delete
-//                 </button>
-//               </td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// };
-
-// export default Products;

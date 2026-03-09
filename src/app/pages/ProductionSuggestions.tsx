@@ -19,13 +19,20 @@ export function ProductionSuggestions() {
 
   if (isLoading) return <p>Loading...</p>;
 
-  const suggestions = data.map((item: ProductionSuggestion) => ({
-    id: item.productId,
-    productName: item.productName,
-    possibleQuantity: item.maxProduction,
-    unitPrice: item.unitPrice,
-    totalValue: item.maxProduction * item.unitPrice,
-  }));
+  const suggestions = data.map((item: ProductionSuggestion) => {
+
+    const maxProduction = Number(item.maxProduction) || 0;
+    const unitPrice = Number(item.unitPrice) || 0;
+
+    return {
+      id: item.productId,
+      productName: item.productName,
+      requiredQuantity: maxProduction,
+      unitPrice: unitPrice,
+      totalValue: maxProduction * unitPrice,
+    };
+
+  });
 
   const totalSuggestedProducts = suggestions.length;
 
@@ -42,7 +49,7 @@ export function ProductionSuggestions() {
 
   const columns = [
     { key: "productName", label: "Product Name", width: "30%" },
-    { key: "possibleQuantity", label: "Possible Quantity", width: "20%" },
+    { key: "requiredQuantity", label: "Required Quantity", width: "20%" },
     {
       key: "unitPrice",
       label: "Unit Price",
@@ -244,38 +251,3 @@ export function ProductionSuggestions() {
     </div>
   );
 }
-
-// import React from "react";
-// import { useGetProductionSuggestionsQuery } from "../../features/production/productionApi";
-
-// export const ProductionSuggestions = () => {
-//   const { data, isLoading } = useGetProductionSuggestionsQuery(undefined);
-
-//   if (isLoading) return <p>Loading...</p>;
-
-//   return (
-//     <div className="p-6">
-//       <h1 className="text-2xl font-bold mb-4">Production Suggestions</h1>
-
-//       <table className="w-full border">
-//         <thead>
-//           <tr className="bg-gray-200">
-//             <th className="p-2">Product</th>
-//             <th className="p-2">Max Production</th>
-//           </tr>
-//         </thead>
-
-//         <tbody>
-//           {data?.map((item) => (
-//             <tr key={item.productId}>
-//               <td className="p-2">{item.productName}</td>
-//               <td className="p-2">{item.maxProduction}</td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// };
-
-// export default ProductionSuggestions;
