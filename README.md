@@ -1,315 +1,209 @@
-# Production Planning System
+# Production Planning System – Frontend
 
-Sistema full-stack para **gestão de produtos, matérias-primas e planejamento de produção**, permitindo calcular automaticamente **quantos produtos podem ser fabricados com base no estoque disponível**.
+Interface web desenvolvida em **React + TypeScript** para gerenciamento de produção industrial.
 
-A aplicação ajuda a responder perguntas como:
+A aplicação consome a **Production Control API** e permite gerenciar:
 
-* Quantos produtos podem ser produzidos com o estoque atual?
-* Quais matérias-primas são necessárias para fabricar um produto?
-* Qual o valor total estimado da produção?
+- Produtos
+- Matérias-primas
+- Composição de produtos
+- Sugestões de produção
+- Dashboard com métricas e gráficos
 
----
+O sistema ajuda a responder perguntas como:
 
-##  Funcionalidades
-
-### Product Management
-
-* Criar produtos
-* Listar produtos
-* Editar produtos
-* Remover produtos
+- Quantos produtos podem ser fabricados com o estoque atual?
+- Quais matérias-primas são necessárias para produzir um produto?
+- Qual o valor estimado da produção?
+- Como está a distribuição do estoque?
 
 ---
 
-### Raw Materials Management
+# Backend API
 
-* Cadastrar matérias-primas
-* Atualizar estoque
-* Listar materiais disponíveis
+Este frontend consome a API:
 
----
-
-###  Product Composition
-
-Define **quais matérias-primas compõem um produto**.
-
-Exemplo:
-
-| Produto | Matéria-prima | Quantidade |
-| ------- | ------------- | ---------- |
-| Bread   | Flour         | 0.5 kg     |
-| Bread   | Yeast         | 0.05 kg    |
+👉 [Repositório do Backend](https://github.com/Priscila-Santos/production_control_API.git)
 
 ---
 
-###  Production Suggestions
+# Funcionalidades
 
-Calcula automaticamente:
+## Dashboard
 
-* Quantos produtos podem ser fabricados com o estoque atual
-* O valor estimado da produção
+Painel com métricas da produção:
 
-Exemplo:
+- Total de produtos
+- Total de matérias-primas
+- Quantidade total em estoque
+- Valor estimado de produção
 
-| Produto | Possível Produção | Preço | Valor Total |
-| ------- | ----------------- | ----- | ----------- |
-| Bread   | 100               | $5    | $500        |
+Gráficos:
 
----
+- **Production Value Trend** (produção mensal)
+- **Stock Distribution** (distribuição do estoque)
 
-##  Arquitetura
+Tecnologia de gráficos:
 
-A aplicação segue arquitetura **Full Stack separada**:
-
-```
-Frontend (React + RTK Query)
-        ↓
-REST API
-        ↓
-Backend (Spring Boot)
-        ↓
-PostgreSQL Database
-```
+- Recharts
 
 ---
 
-##  Tecnologias
+## Product Management
 
-### Frontend
+Permite:
 
-* React
-* TypeScript
-* Redux Toolkit
-* RTK Query
-* Vite
-* Lucide Icons
+- Criar produtos
+- Editar produtos
+- Remover produtos
+- Listar produtos
 
 ---
 
-### Backend
+## Raw Materials Management
 
-* Java 17+
-* Spring Boot
-* Spring Data JPA
-* Bean Validation
-* Lombok
-* PostgreSQL
+Permite:
 
----
-
-## Banco de Dados
-
-* PostgreSQL
-* Migrations SQL
-
----
-
-## 🗂 Estrutura do Projeto
-
-### Frontend
-
-```
-frontend
- ├ features
- │   ├ products
- │   ├ rawMaterials
- │   ├ compositions
- │   └ production
- │
- ├ pages
- │   ├ Products.tsx
- │   ├ RawMaterials.tsx
- │   ├ ProductComposition.tsx
- │   └ ProductionSuggestions.tsx
- │
- ├ components
- │   ├ shared
- │   │   ├ DataTable
- │   │   └ Dialog
- │   └ composition
- │       └ CompositionForm
-```
-
----
-
-### Backend
-
-```
-backend
- ├ product
- │   ├ entity
- │   ├ controller
- │   ├ service
- │   └ repository
- │
- ├ rawmaterial
- │   ├ entity
- │   ├ controller
- │   ├ service
- │   └ repository
- │
- ├ composition
- │   ├ entity
- │   ├ dto
- │   ├ mapper
- │   ├ controller
- │   └ service
- │
- └ production
-     ├ controller
-     └ service
-```
-
----
-
-## 🗄 Estrutura do Banco de Dados
-
-### Products
-
-```sql
-CREATE TABLE products (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    price NUMERIC(10,2) NOT NULL
-);
-```
-
----
-
-### Raw Materials
-
-```sql
-CREATE TABLE raw_materials (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE,
-    stock_quantity NUMERIC(15,3) NOT NULL CHECK (stock_quantity >= 0)
-);
-```
-
----
-
-### Product Composition
-
-Relacionamento **N:N entre produto e matéria-prima**.
-
-```sql
-CREATE TABLE product_raw_materials (
-    product_id BIGINT NOT NULL,
-    raw_material_id BIGINT NOT NULL,
-    required_quantity NUMERIC(15,3) NOT NULL CHECK (required_quantity > 0),
-
-    PRIMARY KEY (product_id, raw_material_id),
-
-    FOREIGN KEY (product_id) REFERENCES products(id),
-    FOREIGN KEY (raw_material_id) REFERENCES raw_materials(id)
-);
-```
-
----
-
-## 🔌 API Endpoints
-
-### Products
-
-| Método | Endpoint             |
-| ------ | -------------------- |
-| GET    | `/api/products`      |
-| POST   | `/api/products`      |
-| PUT    | `/api/products/{id}` |
-| DELETE | `/api/products/{id}` |
-
----
-
-## Raw Materials
-
-| Método | Endpoint                  |
-| ------ | ------------------------- |
-| GET    | `/api/raw-materials`      |
-| POST   | `/api/raw-materials`      |
-| PUT    | `/api/raw-materials/{id}` |
-| DELETE | `/api/raw-materials/{id}` |
+- Cadastrar matérias-primas
+- Atualizar estoque
+- Remover materiais
+- Listar materiais
 
 ---
 
 ## Product Composition
 
-| Método | Endpoint                                           |
-| ------ | -------------------------------------------------- |
-| GET    | `/api/product-materials/product/{productId}`       |
-| POST   | `/api/product-materials`                           |
-| DELETE | `/api/product-materials?productId=&rawMaterialId=` |
+Define quais matérias-primas são usadas em cada produto.
+
+Exemplo:
+
+| Produto | Matéria-prima | Quantidade |
+|--------|---------------|-----------|
+| Bread | Flour | 0.5 kg |
+| Bread | Yeast | 0.05 kg |
 
 ---
 
 ## Production Suggestions
 
-Calcula automaticamente a produção possível.
+Calcula automaticamente:
 
-| Método | Endpoint                      |
-| ------ | ----------------------------- |
-| GET    | `/api/production/suggestions` |
+- Quantidade possível de produção
+- Valor estimado da produção
 
----
+Exemplo:
 
-# 🚀 Como executar o projeto
-
-## 1️⃣ Clonar repositório
-
-```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
-```
+| Produto | Produção | Preço | Valor Total |
+|--------|----------|------|-------------|
+| Bread | 100 | $5 | $500 |
 
 ---
 
-## 2️⃣ Backend
-
-Entrar na pasta do backend:
-
-```bash
-cd backend
-```
-
-Executar aplicação:
-
-```bash
-./mvnw spring-boot:run
-```
-
-ou
-
-```bash
-mvn spring-boot:run
-```
-
-Servidor rodará em:
+# Arquitetura
 
 ```
-http://localhost:8080
+
+React
+↓
+RTK Query
+↓
+REST API
+↓
+Spring Boot Backend
+↓
+PostgreSQL
+
 ```
 
 ---
 
-## 3️⃣ Frontend
+# Tecnologias utilizadas
 
-Entrar na pasta:
+- React
+- TypeScript
+- Vite
+- Redux Toolkit
+- RTK Query
+- Recharts
+- Lucide Icons
+- CSS Modules
 
-```bash
-cd frontend
+---
+
+# Estrutura do projeto
+
 ```
 
-Instalar dependências:
+src
+├ components
+│   ├ dashboard
+│   │   └ StatCard
+│   ├ shared
+│   │   ├ DataTable
+│   │   └ Dialog
+│
+├ features
+│   ├ products
+│   ├ rawMaterials
+│   ├ compositions
+│   ├ production
+│   └ dashboard
+│
+├ pages
+│   ├ Dashboard.tsx
+│   ├ Products.tsx
+│   ├ RawMaterials.tsx
+│   ├ ProductComposition.tsx
+│   └ ProductionSuggestions.tsx
+│
+├ services
+│   └ api.ts
 
-```bash
+```
+
+---
+
+# Configuração da API
+
+Arquivo:
+
+```
+
+services/api.ts
+
+````
+
+```ts
+baseUrl: "http://localhost:8080/api"
+````
+
+---
+
+# Como executar
+
+## 1 Clonar repositório
+
+```
+git clone https://github.com/Priscila-Santos/production_control_app_frontend.git
+```
+
+---
+
+## 2 Instalar dependências
+
+```
 npm install
 ```
 
-Rodar aplicação:
+---
 
-```bash
+## 3 Executar aplicação
+
+```
 npm run dev
 ```
 
-Frontend disponível em:
+Aplicação disponível em:
 
 ```
 http://localhost:5173
@@ -317,77 +211,27 @@ http://localhost:5173
 
 ---
 
-## Lógica de Production Suggestions
+# Fluxo recomendado de uso
 
-O sistema calcula a produção possível usando a fórmula:
-
-```
-produção possível = estoque disponível / quantidade necessária
-```
-
-Para cada matéria-prima:
-
-```
-possible = floor(stock / required_quantity)
-```
-
-A produção máxima de um produto é o **menor valor entre todos os materiais necessários**.
+1 Criar matérias-primas
+2 Criar produtos
+3 Definir composição do produto
+4 Atualizar estoque
+5 Consultar sugestões de produção
+6 Visualizar dashboard
 
 ---
 
-## Exemplo
+# Melhorias futuras
 
-Produto:
-
-```
-Bread
-```
-
-Composição:
-
-| Material | Quantidade |
-| -------- | ---------- |
-| Flour    | 0.5 kg     |
-| Yeast    | 0.05 kg    |
-
-Estoque:
-
-| Material | Estoque |
-| -------- | ------- |
-| Flour    | 50 kg   |
-| Yeast    | 3 kg    |
-
-Cálculo:
-
-```
-Flour → 50 / 0.5 = 100
-Yeast → 3 / 0.05 = 60
-```
-
-Produção máxima:
-
-```
-60 breads
-```
-
----
-
-## Possíveis Melhorias
-
+* Autenticação de usuários
 * Controle de ordens de produção
 * Histórico de produção
-* Dashboard com gráficos
-* Autenticação de usuários
-* Atualização automática de estoque após produção
+* Atualização em tempo real do dashboard
+* Exportação de relatórios
 
 ---
 
-## Autora
+# Autora
 
-Desenvolvido como case tecnico:
-
-* Full Stack Development
-* API REST
-* Arquitetura Backend
-* Integração React + Spring Boot
-
+Projeto desenvolvido por **Priscila Santos**
