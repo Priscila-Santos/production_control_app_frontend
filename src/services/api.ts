@@ -7,7 +7,7 @@ export const api = createApi({
     baseUrl: "http://localhost:8080/api",
   }),
 
-  tagTypes: ["Products", "RawMaterials", "Production", "Composition"],
+  tagTypes: ["Products", "RawMaterials", "Production", "Composition", "Dashboard"],
 
   endpoints: () => ({}),
 });
